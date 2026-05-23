@@ -1,25 +1,30 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { Input as HeroInput } from "@heroui/react";
+import { cn } from "@/lib/utils";
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  fullWidth?: boolean;
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, disabled, fullWidth = true, ...props }, ref) => {
     return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          className
-        )}
+      <HeroInput
         ref={ref}
+        className={cn(
+          "file:border-0 file:bg-transparent file:text-sm file:font-medium",
+          className,
+        )}
+        disabled={disabled}
+        fullWidth={fullWidth}
+        type={type}
+        variant="secondary"
         {...props}
       />
-    )
-  }
-)
-Input.displayName = "Input"
+    );
+  },
+);
+Input.displayName = "Input";
 
-export { Input }
-
+export { Input };

@@ -1,98 +1,77 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { X } from "lucide-react"
+import * as React from "react";
+import { Modal } from "@heroui/react";
+import { cn } from "@/lib/utils";
 
 interface DialogProps {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  children: React.ReactNode
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children: React.ReactNode;
 }
 
 interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  onClose?: () => void
+  onClose?: () => void;
 }
 
-const Dialog = ({ open, onOpenChange, children }: DialogProps) => {
-  if (!open) return null
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={() => onOpenChange?.(false)}
-    >
-      <div className="fixed inset-0 bg-black/50" />
-      <div onClick={(e) => e.stopPropagation()}>{children}</div>
-    </div>
-  )
-}
+const Dialog = ({ open, onOpenChange, children }: DialogProps) => (
+  <Modal.Backdrop isOpen={open} onOpenChange={onOpenChange} variant="opaque">
+    <Modal.Container placement="auto" scroll="inside">
+      {children}
+    </Modal.Container>
+  </Modal.Backdrop>
+);
 
 const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
   ({ className, children, onClose, ...props }, ref) => {
+    const ModalDialog = Modal.Dialog as React.ElementType;
+    const ModalCloseTrigger = Modal.CloseTrigger as React.ElementType;
+
     return (
-      <div
+      <ModalDialog
         ref={ref}
         className={cn(
-          "relative z-50 grid w-full max-w-lg gap-4 border border-slate-300 bg-white p-6 shadow-xl duration-200 rounded-lg",
-          className
+          "relative grid w-full max-w-lg gap-4 border border-slate-200 bg-white p-6 shadow-xl",
+          className,
         )}
         {...props}
       >
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </button>
-        )}
+        {onClose && <ModalCloseTrigger onPress={onClose} />}
         {children}
-      </div>
-    )
-  }
-)
-DialogContent.displayName = "DialogContent"
+      </ModalDialog>
+    );
+  },
+);
+DialogContent.displayName = "DialogContent";
 
 const DialogHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      "flex flex-col space-y-1.5 text-center sm:text-left",
-      className
-    )}
+  <Modal.Header
+    className={cn("flex flex-col space-y-1.5 text-right", className)}
     {...props}
   />
-)
-DialogHeader.displayName = "DialogHeader"
+);
+DialogHeader.displayName = "DialogHeader";
 
 const DialogTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  <h2
+  <Modal.Heading
     ref={ref}
-    className={cn(
-      "text-lg font-semibold leading-none tracking-tight",
-      className
-    )}
+    className={cn("text-lg font-semibold leading-none", className)}
     {...props}
   />
-))
-DialogTitle.displayName = "DialogTitle"
+));
+DialogTitle.displayName = "DialogTitle";
 
 const DialogDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
-))
-DialogDescription.displayName = "DialogDescription"
+  <p ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
+));
+DialogDescription.displayName = "DialogDescription";
 
 export {
   Dialog,
@@ -100,5 +79,4 @@ export {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-}
-
+};
