@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Section, SectionType, ActionAppType } from "@/lib/types";
+import type { SectionType, ActionAppType } from "@/lib/types";
 
 // Types
 interface CreateSectionPayload {

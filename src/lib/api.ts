@@ -16,6 +16,12 @@ export const api = {
   updateContent: (id: number) => `${API_BASE_URL}/admin/content/${id}`,
   deleteContent: (id: number) => `${API_BASE_URL}/admin/content/${id}`,
 
+  // App Versions
+  getAppVersions: `${API_BASE_URL}/admin/app-version`,
+  createAppVersion: `${API_BASE_URL}/admin/app-version`,
+  updateAppVersion: (id: number) => `${API_BASE_URL}/admin/app-version/${id}`,
+  deleteAppVersion: (id: number) => `${API_BASE_URL}/admin/app-version/${id}`,
+
   // Upload - استفاده از IMAGE_URL برای آپلود
   uploadImage: `${IMAGE_URL}`,
 };

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import "./App.css";
 import SectionAdminPanel from "./components/SectionAdminPanel";
+import AppVersionAdminPanel from "./components/AppVersionAdminPanel";
 import { Sidebar, SidebarItem } from "./components/ui/sidebar";
 import { Toaster } from "./components/ui/sonner";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Smartphone } from "lucide-react";
 
 function App() {
   const [activePage, setActivePage] = useState("sections");
@@ -21,7 +22,7 @@ function App() {
                 <h2 className="text-lg font-semibold text-slate-900">
                   پنل مدیریت
                 </h2>
-                <p className="text-xs text-slate-500">سکشن‌های اپ</p>
+                <p className="text-xs text-slate-500">سوپر اپ</p>
               </div>
             </div>
           </div>
@@ -34,11 +35,19 @@ function App() {
               <LayoutDashboard className="h-5 w-5" />
               <span className="font-medium">مدیریت سکشن‌ها</span>
             </SidebarItem>
+            <SidebarItem
+              active={activePage === "versions"}
+              onClick={() => setActivePage("versions")}
+            >
+              <Smartphone className="h-5 w-5" />
+              <span className="font-medium">مدیریت نسخه‌ها</span>
+            </SidebarItem>
           </nav>
         </Sidebar>
 
         <main className="flex-1 overflow-auto">
           {activePage === "sections" && <SectionAdminPanel />}
+          {activePage === "versions" && <AppVersionAdminPanel />}
         </main>
       </div>
       <Toaster position="top-center" dir="rtl" />

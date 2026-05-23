@@ -28,3 +28,16 @@ export interface Section {
   contentItems?: ContentItem[];
 }
 
+export type VersionPlatform = "android" | "ios";
+
+export interface AppVersion {
+  id: number;
+  appName: string;
+  platform: VersionPlatform;
+  latestVersion: string;
+  updateUrl: string;
+  forceUpdate: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
