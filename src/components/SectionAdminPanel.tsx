@@ -27,6 +27,11 @@ import {
   Layers,
   Hash,
   GripVertical,
+  ImagePlus,
+  LayoutGrid,
+  Move,
+  PackageCheck,
+  Palette,
 } from "lucide-react";
 import type {
   Section,
@@ -47,6 +52,14 @@ import { getImageUrl } from "@/lib/imageUrl";
 import { formatJalaliForDisplay, ensureIsoDate } from "@/lib/dateUtils";
 import { PersianDateInput } from "@/components/ui/persian-date-input";
 
+const sectionTypeStyles: Record<SectionType, string> = {
+  IconGrid: "border-sky-200 bg-sky-50 text-sky-700",
+  HeroBanner: "border-indigo-200 bg-indigo-50 text-indigo-700",
+  Carousel: "border-amber-200 bg-amber-50 text-amber-700",
+  SingleImage: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  ServiceGrid: "border-rose-200 bg-rose-50 text-rose-700",
+};
+
 export default function SectionAdminPanel() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<Section | null>(null);
@@ -66,6 +79,18 @@ export default function SectionAdminPanel() {
   // React Query hooks
   const { data: sectionsData } = useGetSections();
   const sections = sectionsData?.data || sectionsData || [];
+  const sectionStats = {
+    total: (sections as Section[]).length,
+    contents: (sections as Section[]).reduce(
+      (sum, section) => sum + (section.contentItems?.length || 0),
+      0,
+    ),
+    images: (sections as Section[]).reduce(
+      (sum, section) =>
+        sum + (section.contentItems?.filter((item) => item.image).length || 0),
+      0,
+    ),
+  };
   const createSectionMutation = useCreateSectionWithContent();
   const updateSectionMutation = useUpdateSection();
   const createContentMutation = useCreateContent();
@@ -432,35 +457,95 @@ export default function SectionAdminPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="container mx-auto px-4 py-6 max-w-6xl" dir="rtl">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-1">
-              پنل مدیریت سکشن‌ها
-            </h1>
-            <p className="text-slate-500 text-sm md:text-base">
-              سکشن‌های صفحه را اینجا اضافه، ویرایش و جابه‌جا کنید
-            </p>
+    <div className="min-h-screen bg-[#f6f8fb]">
+      <header className="border-b border-slate-200 bg-white px-6 py-5" dir="rtl">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#123c69] shadow-sm shadow-sky-900/15">
+              <LayoutGrid className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-950">
+                مدیریت سکشن‌ها
+              </h1>
+              <p className="mt-1 text-sm text-slate-500">
+                سکشن‌های صفحه را اضافه، ویرایش و جابه‌جا کنید.
+              </p>
+            </div>
           </div>
           <Button
             onClick={() => {
               resetForm();
               setIsDialogOpen(true);
             }}
-            className="bg-slate-900 hover:bg-slate-800 text-white whitespace-nowrap"
+            className="whitespace-nowrap bg-[#123c69] px-5 font-semibold text-white shadow-sm shadow-sky-900/20 hover:bg-[#0d3158]"
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="h-4 w-4" />
             افزودن سکشن جدید
           </Button>
         </div>
+      </header>
 
-        <div className="mb-4 text-xs text-slate-500 flex items-center justify-between">
-          <span>برای تغییر ترتیب سکشن‌ها، کارت‌ها را بگیرید و بکشید.</span>
+      <div className="mx-auto max-w-6xl px-6 py-6" dir="rtl">
+        <div className="mb-5 grid gap-3 md:grid-cols-3">
+          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold text-slate-500">
+                  کل سکشن‌ها
+                </p>
+                <p className="mt-2 text-2xl font-extrabold text-slate-950">
+                  {sectionStats.total}
+                </p>
+              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-50 text-sky-700">
+                <LayoutGrid className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-emerald-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold text-emerald-700">
+                  کل محتواها
+                </p>
+                <p className="mt-2 text-2xl font-extrabold text-slate-950">
+                  {sectionStats.contents}
+                </p>
+              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                <PackageCheck className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-amber-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold text-amber-700">
+                  آیتم‌های تصویری
+                </p>
+                <p className="mt-2 text-2xl font-extrabold text-slate-950">
+                  {sectionStats.images}
+                </p>
+              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                <ImagePlus className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-4 flex flex-col gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <span className="inline-flex items-center gap-2">
+            <Move className="h-4 w-4 text-sky-700" />
+            برای تغییر ترتیب سکشن‌ها، کارت‌ها را بگیرید و بکشید.
+          </span>
           <span>تغییر جزئیات هر سکشن از دکمه ویرایش انجام می‌شود.</span>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-5xl mx-auto">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {sections.map((section: Section) => {
             const contentItems = section.contentItems || [];
             const images = contentItems
@@ -472,7 +557,7 @@ export default function SectionAdminPanel() {
             return (
               <Card
                 key={section.id}
-                className="hover:shadow-md transition-all duration-300 border-slate-200 rounded-2xl overflow-hidden group cursor-move bg-white"
+                className="group cursor-move overflow-hidden rounded-xl border-slate-200 bg-white shadow-sm shadow-slate-200/70 transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-lg hover:shadow-sky-100/70"
                 draggable
                 onDragStart={() =>
                   section.id && setDraggingSectionId(section.id)
@@ -482,13 +567,13 @@ export default function SectionAdminPanel() {
               >
                 {/* Preview Images Section */}
                 {images.length > 0 ? (
-                  <div className="relative h-40 md:h-48 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+                  <div className="relative h-40 overflow-hidden bg-[#eef4f8] md:h-48">
                     {images.length === 1 ? (
-                      <div className="h-full p-1">
+                      <div className="h-full p-2">
                         <img
                           src={getImageUrl(images[0].image)}
                           alt={images[0].name}
-                          className="w-full h-full object-contain rounded-md group-hover:scale-105 transition-transform duration-300"
+                          className="h-full w-full rounded-lg object-contain transition-transform duration-300 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = "none";
@@ -496,16 +581,16 @@ export default function SectionAdminPanel() {
                         />
                       </div>
                     ) : images.length === 2 ? (
-                      <div className="grid grid-cols-2 h-full gap-1 p-1">
+                      <div className="grid h-full grid-cols-2 gap-1.5 p-1.5">
                         {images.map((item, idx) => (
                           <div
                             key={idx}
-                            className="relative overflow-hidden rounded-md bg-slate-300"
+                            className="relative overflow-hidden rounded-lg bg-slate-200"
                           >
                             <img
                               src={getImageUrl(item.image!) || item.image}
                               alt={item.name}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.style.display = "none";
@@ -515,24 +600,24 @@ export default function SectionAdminPanel() {
                         ))}
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 h-full gap-1 p-1">
+                      <div className="grid h-full grid-cols-2 gap-1.5 p-1.5">
                         {images.slice(0, 4).map((item, idx) => (
                           <div
                             key={idx}
-                            className="relative overflow-hidden rounded-md bg-slate-300"
+                            className="relative overflow-hidden rounded-lg bg-slate-200"
                           >
                             <img
                               src={getImageUrl(item.image!) || item.image}
                               alt={item.name}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.style.display = "none";
                               }}
                             />
                             {idx === 3 && remainingImages > 0 && (
-                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                <span className="text-white font-semibold text-sm">
+                              <div className="absolute inset-0 flex items-center justify-center bg-slate-950/65">
+                                <span className="rounded-full bg-white/15 px-3 py-1 text-sm font-bold text-white backdrop-blur-sm">
                                   +{remainingImages}
                                 </span>
                               </div>
@@ -543,28 +628,31 @@ export default function SectionAdminPanel() {
                     )}
                   </div>
                 ) : (
-                  <div className="h-32 bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center border-b border-slate-200">
+                  <div className="flex h-32 items-center justify-center border-b border-slate-200 bg-[#eef4f8]">
                     <div className="text-center">
-                      <ImageIcon className="h-10 w-10 text-slate-300 mx-auto mb-2" />
-                      <p className="text-xs text-slate-400">بدون تصویر</p>
+                      <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-lg bg-white text-slate-400 shadow-sm">
+                        <ImageIcon className="h-5 w-5" />
+                      </div>
+                      <p className="text-xs font-medium text-slate-400">
+                        بدون تصویر
+                      </p>
                     </div>
                   </div>
                 )}
 
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg font-semibold text-slate-900 mb-2 line-clamp-2">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="mb-2 line-clamp-2 text-base font-bold text-slate-950">
                         {section.title || "بدون عنوان"}
                       </CardTitle>
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge
-                          variant="secondary"
-                          className="bg-slate-100 text-slate-700 border-slate-300 text-xs font-medium"
+                          className={`text-xs font-semibold ${sectionTypeStyles[section.type]}`}
                         >
                           {getSectionTypeLabel(section.type)}
                         </Badge>
-                        <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <div className="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-500 ring-1 ring-slate-200">
                           <Hash className="h-3 w-3" />
                           <span>{section.position}</span>
                         </div>
@@ -576,30 +664,30 @@ export default function SectionAdminPanel() {
                 <CardContent className="pt-0">
                   <div className="space-y-4">
                     {/* Content Stats */}
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between rounded-lg border border-emerald-100 bg-emerald-50/70 p-3">
                       <div className="flex items-center gap-2">
-                        <Layers className="h-4 w-4 text-slate-600" />
-                        <span className="text-sm font-medium text-slate-700">
+                        <Layers className="h-4 w-4 text-emerald-700" />
+                        <span className="text-sm font-semibold text-emerald-800">
                           تعداد محتوا
                         </span>
                       </div>
-                      <span className="text-sm font-bold text-slate-900">
+                      <span className="rounded-md bg-white px-2 py-0.5 text-sm font-extrabold text-slate-950 ring-1 ring-emerald-100">
                         {contentItems.length}
                       </span>
                     </div>
 
                     {/* Content Preview List */}
                     {contentItems.length > 0 && (
-                      <div className="space-y-1.5 max-h-32 min-h-32 overflow-y-auto">
+                      <div className="max-h-32 min-h-32 space-y-1.5 overflow-y-auto">
                         {contentItems.slice(0, 3).map((item, idx) => (
                           <div
                             key={idx}
-                            className="flex items-center gap-2 p-2 rounded-md bg-slate-100 hover:bg-slate-100 transition-colors"
+                            className="flex items-center gap-2 rounded-lg bg-slate-50 p-2 ring-1 ring-slate-100 transition-colors hover:bg-sky-50"
                           >
-                            <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-semibold text-slate-600">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white text-xs font-bold text-sky-700 ring-1 ring-sky-100">
                               {idx + 1}
                             </div>
-                            <span className="text-xs text-slate-700 flex-1 truncate">
+                            <span className="flex-1 truncate text-xs font-medium text-slate-700">
                               {item.name || "بدون نام"}
                             </span>
                             {item.badgeName && (
@@ -616,7 +704,7 @@ export default function SectionAdminPanel() {
                           </div>
                         ))}
                         {contentItems.length > 3 && (
-                          <p className="text-xs text-slate-500 text-center pt-1">
+                          <p className="pt-1 text-center text-xs text-slate-500">
                             و {contentItems.length - 3} مورد دیگر...
                           </p>
                         )}
@@ -624,22 +712,22 @@ export default function SectionAdminPanel() {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2 border-t border-slate-200">
+                    <div className="flex gap-2 border-t border-slate-200 pt-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleEdit(section)}
-                        className="flex-1 border-slate-300 hover:bg-slate-50 hover:border-slate-400"
+                        className="flex-1 border-indigo-200 bg-indigo-50 font-semibold text-indigo-700 shadow-none hover:bg-indigo-100"
                       >
-                        <Edit className="h-4 w-4 ml-1" />
+                        <Edit className="h-4 w-4" />
                         ویرایش
                       </Button>
                       {section.id && (
                         <Button
-                          variant="destructive"
+                          variant="outline"
                           size="sm"
                           onClick={() => handleDelete(section.id!)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-4"
+                          className="border-rose-200 bg-rose-50 px-4 text-rose-700 shadow-none hover:bg-rose-100"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -653,12 +741,15 @@ export default function SectionAdminPanel() {
         </div>
 
         {sections.length === 0 && (
-          <Card className="text-center py-10 border-dashed border-slate-300 bg-white/70 max-w-md mx-auto mt-8">
+          <Card className="mx-auto mt-8 max-w-md border-dashed border-sky-200 bg-white/80 py-10 text-center shadow-sm">
             <CardContent>
-              <p className="text-slate-600 text-base md:text-lg">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-sky-50 text-sky-700">
+                <LayoutGrid className="h-6 w-6" />
+              </div>
+              <p className="text-base font-bold text-slate-700 md:text-lg">
                 هنوز سکشنی ایجاد نشده است
               </p>
-              <p className="text-slate-400 text-sm mt-2">
+              <p className="mt-2 text-sm text-slate-400">
                 برای شروع، روی «افزودن سکشن جدید» کلیک کنید
               </p>
             </CardContent>
@@ -676,27 +767,37 @@ export default function SectionAdminPanel() {
         }}
       >
         <DialogContent
-          className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0"
+          className="flex max-h-[90vh] max-w-4xl flex-col overflow-hidden p-0"
           dir="rtl"
           onClose={() => {
             setIsDialogOpen(false);
             resetForm();
           }}
         >
-          <div className="p-4 border-b border-slate-200 bg-slate-50/50">
+          <div className="border-b border-slate-200 bg-[#eef4f8] p-4">
             <DialogHeader className="text-right">
-              <DialogTitle className="text-xl font-semibold text-slate-900">
-                {editingSection ? "ویرایش سکشن" : "ایجاد سکشن جدید"}
-              </DialogTitle>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-sky-700 shadow-sm">
+                  <Palette className="h-5 w-5" />
+                </div>
+                <div>
+                  <DialogTitle className="text-right text-lg font-bold text-slate-950">
+                    {editingSection ? "ویرایش سکشن" : "ایجاد سکشن جدید"}
+                  </DialogTitle>
+                  <p className="mt-1 text-xs text-slate-500">
+                    اطلاعات سکشن و آیتم‌های داخل آن را تنظیم کنید.
+                  </p>
+                </div>
+              </div>
             </DialogHeader>
           </div>
           <form
             id="section-form"
             onSubmit={handleSubmit}
-            className="flex-1 overflow-y-auto p-4 space-y-4"
+            className="flex-1 space-y-4 overflow-y-auto bg-[#f8fafc] p-4"
           >
             {/* اطلاعات اصلی سکشن - فشرده */}
-            <div className="grid grid-cols-3 gap-3 p-3 bg-slate-50/50 rounded-lg border border-slate-200">
+            <div className="grid gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm md:grid-cols-3">
               <div className="space-y-1.5">
                 <Label
                   htmlFor="type"
@@ -770,8 +871,8 @@ export default function SectionAdminPanel() {
 
             {/* بخش محتواها */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-slate-800">
+              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+                <h3 className="text-sm font-bold text-slate-900">
                   محتواها ({formData.contentItems?.length || 0})
                 </h3>
                 <Button
@@ -779,9 +880,9 @@ export default function SectionAdminPanel() {
                   variant="outline"
                   size="sm"
                   onClick={handleAddContent}
-                  className="h-8 text-xs border-slate-300 hover:bg-slate-50"
+                  className="h-8 border-sky-200 bg-sky-50 text-xs font-semibold text-sky-700 shadow-none hover:bg-sky-100"
                 >
-                  <Plus className="h-3 w-3 ml-1" />
+                  <Plus className="h-3 w-3" />
                   افزودن
                 </Button>
               </div>
@@ -790,18 +891,18 @@ export default function SectionAdminPanel() {
                 {formData.contentItems?.map((content, index) => (
                   <Card
                     key={content.id ?? index}
-                    className="p-3 border-slate-200 shadow-sm hover:shadow transition-all bg-white cursor-move group"
+                    className="group cursor-move rounded-xl border-slate-200 bg-white p-3 shadow-sm transition-all hover:border-sky-200 hover:shadow-md"
                     draggable
                     onDragStart={() => handleContentDragStart(index)}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={() => handleContentDrop(index)}
                   >
-                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
-                      <GripVertical className="h-4 w-4 text-slate-400 cursor-move" />
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-semibold text-xs">
+                    <div className="mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
+                      <GripVertical className="h-4 w-4 cursor-move text-slate-400" />
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sky-50 text-xs font-bold text-sky-700 ring-1 ring-sky-100">
                         {index + 1}
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <Input
                           value={content.name}
                           onChange={(e) =>
@@ -809,7 +910,7 @@ export default function SectionAdminPanel() {
                           }
                           placeholder="نام محتوا *"
                           required
-                          className="h-8 text-sm border-0 bg-transparent p-0 font-medium focus-visible:ring-0"
+                          className="h-8 border-0 bg-transparent p-0 text-sm font-bold focus-visible:ring-0"
                         />
                       </div>
                       <Button
@@ -817,13 +918,13 @@ export default function SectionAdminPanel() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemoveContent(index)}
-                        className="h-7 w-7 p-0 hover:bg-red-50 hover:text-red-600 text-slate-400"
+                        className="h-7 w-7 p-0 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid gap-3 md:grid-cols-2">
                       <div className="space-y-1.5">
                         <Label className="text-xs font-medium text-slate-600">
                           تصویر
@@ -839,7 +940,7 @@ export default function SectionAdminPanel() {
                               }
                             }}
                             disabled={uploadImageMutation.isPending}
-                            className="cursor-pointer h-8 text-xs"
+                            className="h-8 cursor-pointer border-slate-200 bg-slate-50 text-xs"
                           />
                           {uploadImageMutation.isPending && (
                             <p className="text-xs text-blue-600 flex items-center gap-1">
@@ -861,7 +962,7 @@ export default function SectionAdminPanel() {
                                 placeholder="URL تصویر"
                                 className="text-xs h-7"
                               />
-                              <div className="rounded overflow-hidden border border-slate-200">
+                              <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
                                 <img
                                   src={
                                     getImageUrl(content.image) || content.image
@@ -871,7 +972,7 @@ export default function SectionAdminPanel() {
                                     const target = e.target as HTMLImageElement;
                                     target.style.display = "none";
                                   }}
-                                  className="w-full h-24 object-cover"
+                                  className="h-24 w-full object-cover"
                                 />
                               </div>
                             </div>
@@ -994,7 +1095,7 @@ export default function SectionAdminPanel() {
                       </div>
 
                       {/* تاریخ انتشار و عدم انتشار */}
-                      <div className="col-span-2 grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                      <div className="grid gap-3 border-t border-slate-100 pt-2 md:col-span-2 md:grid-cols-2">
                         <div className="space-y-1.5">
                           <div className="flex items-center justify-between">
                             <Label className="text-xs font-medium text-slate-600">
@@ -1004,7 +1105,7 @@ export default function SectionAdminPanel() {
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="h-6 text-xs px-2"
+                              className="h-6 px-2 text-xs text-sky-700 hover:bg-sky-50"
                               onClick={() => {
                                 const now = new Date();
                                 handleContentChange(
@@ -1044,7 +1145,7 @@ export default function SectionAdminPanel() {
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="h-6 text-xs px-2"
+                              className="h-6 px-2 text-xs text-sky-700 hover:bg-sky-50"
                               onClick={() => {
                                 const now = new Date();
                                 handleContentChange(
@@ -1083,12 +1184,12 @@ export default function SectionAdminPanel() {
 
               {(!formData.contentItems ||
                 formData.contentItems.length === 0) && (
-                <Card className="p-6 text-center border-2 border-dashed border-slate-300 bg-slate-50/50">
+                <Card className="border-2 border-dashed border-sky-200 bg-white/80 p-6 text-center shadow-sm">
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center">
-                      <Plus className="h-6 w-6 text-slate-400" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-sky-50 text-sky-700">
+                      <Plus className="h-6 w-6" />
                     </div>
-                    <p className="text-sm text-slate-600 font-medium">
+                    <p className="text-sm font-bold text-slate-700">
                       هنوز محتوایی اضافه نشده است
                     </p>
                     <Button
@@ -1096,9 +1197,9 @@ export default function SectionAdminPanel() {
                       variant="outline"
                       size="sm"
                       onClick={handleAddContent}
-                      className="h-8 text-xs border-slate-300 hover:bg-slate-100"
+                      className="h-8 border-sky-200 bg-sky-50 text-xs font-semibold text-sky-700 shadow-none hover:bg-sky-100"
                     >
-                      <Plus className="h-3 w-3 ml-1" />
+                      <Plus className="h-3 w-3" />
                       افزودن محتوا
                     </Button>
                   </div>
@@ -1106,7 +1207,7 @@ export default function SectionAdminPanel() {
               )}
             </div>
           </form>
-          <div className="sticky bottom-0 bg-white border-t border-slate-200 p-3 flex justify-start gap-2 shadow-lg">
+          <div className="sticky bottom-0 flex justify-start gap-2 border-t border-slate-200 bg-white p-3 shadow-lg">
             <Button
               type="button"
               variant="outline"
@@ -1115,7 +1216,7 @@ export default function SectionAdminPanel() {
                 setIsDialogOpen(false);
                 resetForm();
               }}
-              className="h-9 min-w-[90px] text-sm border-slate-300"
+              className="h-9 min-w-[90px] border-slate-300 text-sm"
             >
               انصراف
             </Button>
@@ -1129,9 +1230,9 @@ export default function SectionAdminPanel() {
                 createContentMutation.isPending ||
                 updateContentMutation.isPending
               }
-              className="bg-slate-900 hover:bg-slate-800 text-white h-9 min-w-[110px] text-sm"
+              className="h-9 min-w-[110px] bg-[#123c69] text-sm font-semibold text-white hover:bg-[#0d3158]"
             >
-              <Save className="h-3.5 w-3.5 ml-1" />
+              <Save className="h-3.5 w-3.5" />
               {createSectionMutation.isPending ||
               updateSectionMutation.isPending ||
               createContentMutation.isPending ||

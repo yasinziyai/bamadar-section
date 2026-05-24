@@ -30,7 +30,7 @@ const SidebarItem = ({ children, active, onClick, className }: SidebarItemProps)
       className={cn(
         "w-full text-right px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-3",
         active
-          ? "bg-slate-900 text-white"
+          ? "bg-[#123c69] text-white hover:bg-[#0d3158]"
           : "text-slate-700 hover:bg-slate-50 hover:text-slate-900",
         className
       )}
@@ -41,4 +41,3 @@ const SidebarItem = ({ children, active, onClick, className }: SidebarItemProps)
 }
 
 export { Sidebar, SidebarItem }
-

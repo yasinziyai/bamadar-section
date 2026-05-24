@@ -13,8 +13,16 @@ export interface AppVersionPayload {
 
 export type UpdateAppVersionPayload = Partial<AppVersionPayload>;
 
+export interface AppVersionFilters {
+  app?: string;
+  version?: string;
+  platform?: VersionPlatform;
+}
+
 export const appVersionQueryKeys = {
   appVersions: ["app-versions"] as const,
+  list: (filters: AppVersionFilters) =>
+    [...appVersionQueryKeys.appVersions, filters] as const,
 };
 
 const parseError = async (response: Response, fallback: string) => {
@@ -22,8 +30,23 @@ const parseError = async (response: Response, fallback: string) => {
   throw new Error(error.message || fallback);
 };
 
-const getAppVersions = async (): Promise<{ status: boolean; data: AppVersion[] }> => {
-  const response = await fetch(api.getAppVersions, {
+const getAppVersionsUrl = (filters: AppVersionFilters) => {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) {
+      params.set(key, value);
+    }
+  });
+
+  const query = params.toString();
+  return query ? `${api.getAppVersions}?${query}` : api.getAppVersions;
+};
+
+const getAppVersions = async (
+  filters: AppVersionFilters,
+): Promise<{ status: boolean; data: AppVersion[] }> => {
+  const response = await fetch(getAppVersionsUrl(filters), {
     method: "GET",
   });
 
@@ -78,10 +101,10 @@ const deleteAppVersion = async (id: number) => {
   return response.json();
 };
 
-export const useGetAppVersions = () => {
+export const useGetAppVersions = (filters: AppVersionFilters = {}) => {
   return useQuery({
-    queryKey: appVersionQueryKeys.appVersions,
-    queryFn: getAppVersions,
+    queryKey: appVersionQueryKeys.list(filters),
+    queryFn: () => getAppVersions(filters),
   });
 };
 

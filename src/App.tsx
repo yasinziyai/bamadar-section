@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import SectionAdminPanel from "./components/SectionAdminPanel";
 import AppVersionAdminPanel from "./components/AppVersionAdminPanel";
@@ -7,7 +7,26 @@ import { Toaster } from "./components/ui/sonner";
 import { LayoutDashboard, Smartphone } from "lucide-react";
 
 function App() {
-  const [activePage, setActivePage] = useState("sections");
+  const getPageFromPath = () =>
+    window.location.pathname.startsWith("/versions") ? "versions" : "sections";
+  const [activePage, setActivePage] = useState(getPageFromPath);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setActivePage(getPageFromPath());
+    };
+
+    window.addEventListener("popstate", handleLocationChange);
+    return () => window.removeEventListener("popstate", handleLocationChange);
+  }, []);
+
+  const navigateToPage = (page: "sections" | "versions") => {
+    const nextUrl =
+      page === "versions" ? `/versions${window.location.search}` : "/";
+
+    window.history.pushState(null, "", nextUrl);
+    setActivePage(page);
+  };
 
   return (
     <>
@@ -30,14 +49,14 @@ function App() {
           <nav className="flex-1 p-4 space-y-2">
             <SidebarItem
               active={activePage === "sections"}
-              onClick={() => setActivePage("sections")}
+              onClick={() => navigateToPage("sections")}
             >
               <LayoutDashboard className="h-5 w-5" />
               <span className="font-medium">مدیریت سکشن‌ها</span>
             </SidebarItem>
             <SidebarItem
               active={activePage === "versions"}
-              onClick={() => setActivePage("versions")}
+              onClick={() => navigateToPage("versions")}
             >
               <Smartphone className="h-5 w-5" />
               <span className="font-medium">مدیریت نسخه‌ها</span>

@@ -28,7 +28,7 @@ export interface Section {
   contentItems?: ContentItem[];
 }
 
-export type VersionPlatform = "android" | "ios";
+export type VersionPlatform = "android" | "ios" | "web";
 
 export interface AppVersion {
   id: number;
