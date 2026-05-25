@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import SectionAdminPanel from "./components/SectionAdminPanel";
 import AppVersionAdminPanel from "./components/AppVersionAdminPanel";
-import { Sidebar, SidebarItem } from "./components/ui/sidebar";
+import { Sidebar, SidebarGroup, SidebarItem } from "./components/ui/sidebar";
 import { Toaster } from "./components/ui/sonner";
-import { LayoutDashboard, Smartphone } from "lucide-react";
+import { Folder, LayoutDashboard, RefreshCw, Smartphone } from "lucide-react";
 
 function App() {
   const getPageFromPath = () =>
@@ -32,10 +32,10 @@ function App() {
     <>
       <div className="flex h-screen w-full bg-white" dir="rtl">
         <Sidebar>
-          <div className="p-6 border-b border-slate-400">
+          <div className="border-b border-slate-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center">
-                <LayoutDashboard className="h-5 w-5 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#123c69]">
+                <LayoutDashboard className="h-5 w-5 text-white" aria-hidden />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">
@@ -46,21 +46,37 @@ function App() {
             </div>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2">
-            <SidebarItem
+          <nav className="flex-1 space-y-4 p-4">
+            <p className="px-4 text-xs font-semibold text-slate-400">صفحات</p>
+            <SidebarGroup
               active={activePage === "sections"}
-              onClick={() => navigateToPage("sections")}
+              icon={<Folder className="h-5 w-5" aria-hidden />}
+              title="سوپر اپ"
             >
-              <LayoutDashboard className="h-5 w-5" />
-              <span className="font-medium">مدیریت سکشن‌ها</span>
-            </SidebarItem>
-            <SidebarItem
+              <SidebarItem
+                active={activePage === "sections"}
+                onClick={() => navigateToPage("sections")}
+                subItem
+              >
+                <LayoutDashboard className="h-4 w-4" aria-hidden />
+                <span className="font-medium">مدیریت سکشن‌ها</span>
+              </SidebarItem>
+            </SidebarGroup>
+
+            <SidebarGroup
               active={activePage === "versions"}
-              onClick={() => navigateToPage("versions")}
+              icon={<RefreshCw className="h-5 w-5" aria-hidden />}
+              title="آپدیت‌ها"
             >
-              <Smartphone className="h-5 w-5" />
-              <span className="font-medium">مدیریت نسخه‌ها</span>
-            </SidebarItem>
+              <SidebarItem
+                active={activePage === "versions"}
+                onClick={() => navigateToPage("versions")}
+                subItem
+              >
+                <Smartphone className="h-4 w-4" aria-hidden />
+                <span className="font-medium">مدیریت نسخه‌ها</span>
+              </SidebarItem>
+            </SidebarGroup>
           </nav>
         </Sidebar>
 
