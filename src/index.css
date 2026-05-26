@@ -94,6 +94,47 @@
 :root {
   --font-persian: "IRANYekanXFaNum", system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --app-primary: #123c69;
+  --app-primary-hover: #0d3158;
+  --app-primary-soft: #e8f2fb;
+  --app-bg: #f6f8fb;
+  --app-muted: #eef4f8;
+  --app-surface: #ffffff;
+  --app-surface-alt: #f8fafc;
+  --app-input: #ffffff;
+  --app-border: #e2e8f0;
+  --app-text: #0f172a;
+  --app-text-muted: #64748b;
+}
+
+:root[data-color-theme="emerald"] {
+  --app-primary: #047857;
+  --app-primary-hover: #065f46;
+  --app-primary-soft: #dff8ef;
+}
+
+:root[data-color-theme="violet"] {
+  --app-primary: #6d28d9;
+  --app-primary-hover: #581c87;
+  --app-primary-soft: #f0e7ff;
+}
+
+:root[data-color-theme="sunset"] {
+  --app-primary: #be123c;
+  --app-primary-hover: #9f1239;
+  --app-primary-soft: #ffe6df;
+}
+
+:root[data-mode="dark"] {
+  --app-primary-soft: color-mix(in srgb, var(--app-primary) 22%, #111827);
+  --app-bg: #0b101b;
+  --app-muted: #121a29;
+  --app-surface: #111827;
+  --app-surface-alt: #151f31;
+  --app-input: #242426;
+  --app-border: #2b384d;
+  --app-text: #edf2f7;
+  --app-text-muted: #9aa8bb;
 }
 
 @layer base {
@@ -141,6 +182,218 @@
     --input: 217.2 32.6% 35%;
     --ring: 224.3 76.3% 48%;
   }
+}
+
+.app-shell {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+.app-shell .app-sidebar {
+  background-color: var(--app-surface) !important;
+}
+
+.app-shell[dir="rtl"] .app-sidebar {
+  border-left-width: 1px;
+}
+
+.app-shell[dir="ltr"] .app-sidebar {
+  border-right-width: 1px;
+}
+
+.app-shell[dir="rtl"] .app-sidebar-subitems {
+  margin-right: 1.25rem;
+  padding-right: 0.75rem;
+  border-right-width: 1px;
+}
+
+.app-shell[dir="ltr"] .app-sidebar-subitems {
+  margin-left: 1.25rem;
+  padding-left: 0.75rem;
+  border-left-width: 1px;
+}
+
+.app-shell .bg-\[\#123c69\] {
+  background-color: var(--app-primary) !important;
+}
+
+.app-shell .hover\:bg-\[\#0d3158\]:hover {
+  background-color: var(--app-primary-hover) !important;
+}
+
+.app-shell .text-\[\#123c69\] {
+  color: var(--app-primary) !important;
+}
+
+.app-shell .bg-\[\#f6f8fb\] {
+  background-color: var(--app-bg) !important;
+}
+
+.app-shell .bg-\[\#eef4f8\],
+.app-shell .bg-\[\#f8fafc\] {
+  background-color: var(--app-muted) !important;
+}
+
+.app-shell[data-mode="dark"] .bg-white {
+  background-color: var(--app-surface) !important;
+}
+
+.app-shell[data-mode="dark"] .bg-slate-50,
+.app-shell[data-mode="dark"] .bg-slate-100 {
+  background-color: var(--app-surface-alt) !important;
+}
+
+.app-shell[data-mode="dark"] .border-slate-100,
+.app-shell[data-mode="dark"] .border-slate-200,
+.app-shell[data-mode="dark"] .border-slate-300 {
+  border-color: var(--app-border) !important;
+}
+
+.app-shell[data-mode="dark"] .text-slate-950,
+.app-shell[data-mode="dark"] .text-slate-900,
+.app-shell[data-mode="dark"] .text-slate-800,
+.app-shell[data-mode="dark"] .text-slate-700 {
+  color: var(--app-text) !important;
+}
+
+.app-shell[data-mode="dark"] .text-slate-600,
+.app-shell[data-mode="dark"] .text-slate-500,
+.app-shell[data-mode="dark"] .text-slate-400 {
+  color: var(--app-text-muted) !important;
+}
+
+:root[data-mode="dark"] .bg-white,
+:root[data-mode="dark"] .bg-white\/80 {
+  background-color: var(--app-surface) !important;
+}
+
+:root[data-mode="dark"] .bg-\[\#f6f8fb\] {
+  background-color: var(--app-bg) !important;
+}
+
+:root[data-mode="dark"] .bg-\[\#eef4f8\],
+:root[data-mode="dark"] .bg-\[\#f8fafc\],
+:root[data-mode="dark"] .bg-slate-50,
+:root[data-mode="dark"] .bg-slate-100 {
+  background-color: var(--app-surface-alt) !important;
+}
+
+:root[data-mode="dark"] .bg-slate-200 {
+  background-color: #263248 !important;
+}
+
+:root[data-mode="dark"] .bg-sky-50,
+:root[data-mode="dark"] .hover\:bg-sky-50:hover,
+:root[data-mode="dark"] .hover\:bg-sky-100:hover {
+  background-color: color-mix(in srgb, var(--app-primary) 18%, #111827) !important;
+}
+
+:root[data-mode="dark"] .bg-indigo-50,
+:root[data-mode="dark"] .hover\:bg-indigo-100:hover {
+  background-color: rgba(99, 102, 241, 0.16) !important;
+}
+
+:root[data-mode="dark"] .bg-rose-50,
+:root[data-mode="dark"] .hover\:bg-rose-50:hover,
+:root[data-mode="dark"] .hover\:bg-rose-100:hover {
+  background-color: rgba(244, 63, 94, 0.14) !important;
+}
+
+:root[data-mode="dark"] .bg-emerald-50,
+:root[data-mode="dark"] .bg-emerald-50\/70 {
+  background-color: rgba(16, 185, 129, 0.13) !important;
+}
+
+:root[data-mode="dark"] .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+}
+
+:root[data-mode="dark"] .border-slate-100,
+:root[data-mode="dark"] .border-slate-200,
+:root[data-mode="dark"] .border-slate-300,
+:root[data-mode="dark"] .ring-slate-100,
+:root[data-mode="dark"] .ring-slate-200 {
+  border-color: var(--app-border) !important;
+  --tw-ring-color: var(--app-border) !important;
+}
+
+:root[data-mode="dark"] .border-sky-200,
+:root[data-mode="dark"] .ring-sky-100,
+:root[data-mode="dark"] .ring-sky-200 {
+  border-color: color-mix(in srgb, var(--app-primary) 42%, #2b384d) !important;
+  --tw-ring-color: color-mix(in srgb, var(--app-primary) 42%, #2b384d) !important;
+}
+
+:root[data-mode="dark"] .border-indigo-200 {
+  border-color: rgba(129, 140, 248, 0.34) !important;
+}
+
+:root[data-mode="dark"] .border-rose-200 {
+  border-color: rgba(251, 113, 133, 0.34) !important;
+}
+
+:root[data-mode="dark"] .border-emerald-100,
+:root[data-mode="dark"] .border-emerald-200,
+:root[data-mode="dark"] .ring-emerald-100 {
+  border-color: rgba(52, 211, 153, 0.34) !important;
+  --tw-ring-color: rgba(52, 211, 153, 0.34) !important;
+}
+
+:root[data-mode="dark"] .border-amber-200 {
+  border-color: rgba(251, 191, 36, 0.34) !important;
+}
+
+:root[data-mode="dark"] .text-slate-950,
+:root[data-mode="dark"] .text-slate-900,
+:root[data-mode="dark"] .text-slate-800,
+:root[data-mode="dark"] .text-slate-700 {
+  color: var(--app-text) !important;
+}
+
+:root[data-mode="dark"] .text-slate-600,
+:root[data-mode="dark"] .text-slate-500,
+:root[data-mode="dark"] .text-slate-400 {
+  color: var(--app-text-muted) !important;
+}
+
+:root[data-mode="dark"] .text-sky-700,
+:root[data-mode="dark"] .text-indigo-700 {
+  color: #93c5fd !important;
+}
+
+:root[data-mode="dark"] .text-emerald-700,
+:root[data-mode="dark"] .text-emerald-800 {
+  color: #7dd3b0 !important;
+}
+
+:root[data-mode="dark"] .text-amber-700 {
+  color: #f6c86b !important;
+}
+
+:root[data-mode="dark"] .text-rose-600,
+:root[data-mode="dark"] .text-rose-700 {
+  color: #fda4af !important;
+}
+
+:root[data-mode="dark"] .shadow-slate-200\/70,
+:root[data-mode="dark"] .shadow-sky-100\/70,
+:root[data-mode="dark"] .shadow-sky-900\/15,
+:root[data-mode="dark"] .shadow-sky-900\/20 {
+  --tw-shadow-color: rgba(0, 0, 0, 0.38) !important;
+}
+
+:root[data-mode="dark"] input,
+:root[data-mode="dark"] textarea,
+:root[data-mode="dark"] select {
+  background-color: var(--app-input);
+  color: var(--app-text);
+  color-scheme: dark;
+}
+
+.app-shell[data-mode="dark"] input,
+.app-shell[data-mode="dark"] button,
+.app-shell[data-mode="dark"] [role="button"] {
+  color-scheme: dark;
 }
 
 @layer base {

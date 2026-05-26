@@ -19,6 +19,7 @@ export const api = {
 
   // App Versions
   getAppVersions: `${APP_VERSION_API_BASE_URL}/admin/app-version`,
+  getAppDownloadReport: `${APP_VERSION_API_BASE_URL}/admin/app-version/download-report`,
   createAppVersion: `${APP_VERSION_API_BASE_URL}/admin/app-version`,
   updateAppVersion: (id: number) =>
     `${APP_VERSION_API_BASE_URL}/admin/app-version/${id}`,

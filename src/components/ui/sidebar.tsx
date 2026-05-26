@@ -18,7 +18,7 @@ const Sidebar = ({ children, className }: SidebarProps) => {
       )}
       variant="secondary"
       className={cn(
-        "w-64 flex-shrink-0 border-l border-slate-200 bg-white shadow-sm",
+        "app-sidebar w-64 flex-shrink-0 border-slate-200 bg-white shadow-sm",
         className
       )}
     >
@@ -66,13 +66,13 @@ const SidebarGroup = ({
         size="md"
         variant="ghost"
         className={cn(
-          "h-12 justify-start gap-3 rounded-lg px-4 text-right font-semibold transition-colors",
+          "h-12 justify-start gap-3 rounded-lg px-4 text-start font-semibold transition-colors",
           active
-            ? "text-[#123c69] hover:bg-slate-100"
-            : "text-slate-700 hover:bg-slate-100 hover:text-slate-950"
+            ? "text-[#123c69] hover:bg-slate-100 dark:text-sky-300 dark:hover:bg-white/5"
+            : "text-slate-700 hover:bg-slate-100 hover:text-slate-950 dark:text-[var(--app-text-muted)] dark:hover:bg-white/5 dark:hover:text-[var(--app-text)]"
         )}
       >
-        {icon && <span className="text-[#123c69]">{icon}</span>}
+        {icon && <span className="text-[#123c69] dark:text-sky-300">{icon}</span>}
         <span className="flex-1 truncate">{title}</span>
         <ChevronDown
           className={cn(
@@ -83,7 +83,7 @@ const SidebarGroup = ({
       </HeroButtonRoot>
 
       {open && (
-        <div className="mr-5 space-y-1 border-r border-slate-200 pr-3">
+        <div className="app-sidebar-subitems space-y-1 border-slate-200">
           {children}
         </div>
       )}
@@ -107,11 +107,11 @@ const SidebarItem = ({
       size="md"
       variant={active ? "primary" : "ghost"}
       className={cn(
-        "justify-start gap-3 rounded-lg text-right transition-colors",
+        "justify-start gap-3 rounded-lg text-start transition-colors",
         subItem ? "h-10 px-3 text-sm" : "h-12 px-4",
         active
           ? "bg-[#123c69] text-white hover:bg-[#0d3158]"
-          : "text-slate-700 hover:bg-slate-100 hover:text-slate-950",
+          : "text-slate-700 hover:bg-slate-100 hover:text-slate-950 dark:text-[var(--app-text-muted)] dark:hover:bg-white/5 dark:hover:text-[var(--app-text)]",
         className
       )}
     >

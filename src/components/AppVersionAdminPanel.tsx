@@ -41,6 +41,7 @@ import {
   type AppVersionFilters,
   type AppVersionPayload,
 } from "@/hooks/useAppVersions";
+import { useAppSettings } from "@/lib/appSettings";
 import type { AppVersion, VersionPlatform } from "@/lib/types";
 
 const emptyForm: AppVersionPayload = {
@@ -52,12 +53,6 @@ const emptyForm: AppVersionPayload = {
   isActive: true,
 };
 
-const platformLabels: Record<VersionPlatform, string> = {
-  android: "اندروید",
-  ios: "iOS",
-  web: "وب",
-};
-
 const platformBadgeClass: Record<VersionPlatform, string> = {
   android: "border-emerald-200 bg-emerald-50 text-emerald-700",
   ios: "border-sky-200 bg-sky-50 text-sky-700",
@@ -66,6 +61,107 @@ const platformBadgeClass: Record<VersionPlatform, string> = {
 
 const appVersionInputClass = "placeholder:text-slate-400/60";
 const platformValues: VersionPlatform[] = ["android", "ios", "web"];
+
+const versionCopy = {
+  fa: {
+    title: "مدیریت نسخه اپ‌ها",
+    description: "نسخه‌ها بر اساس نام اپ و پلتفرم مدیریت می‌شوند.",
+    create: "ثبت نسخه",
+    total: "کل نسخه‌ها",
+    activeVersions: "نسخه‌های فعال",
+    forcedUpdates: "آپدیت اجباری",
+    filters: "فیلتر نسخه‌ها",
+    app: "اپلیکیشن",
+    versionNumber: "شماره ورژن",
+    versionPlaceholder: "ورژن",
+    allPlatforms: "همه پلتفرم‌ها",
+    clear: "پاک کردن",
+    listTitle: "لیست آپدیت‌ها",
+    listDescription: "وضعیت انتشار و لینک دریافت هر نسخه",
+    appName: "نام اپ",
+    platform: "پلتفرم",
+    latestVersion: "آخرین نسخه",
+    updateUrl: "لینک آپدیت",
+    forced: "اجباری",
+    optional: "اختیاری",
+    status: "وضعیت",
+    active: "فعال",
+    inactive: "غیرفعال",
+    lastChange: "آخرین تغییر",
+    actions: "عملیات",
+    loading: "در حال دریافت...",
+    emptyFiltered: "نتیجه‌ای برای فیلترهای انتخاب‌شده پیدا نشد.",
+    empty: "نسخه‌ای ثبت نشده است.",
+    editTitle: "ویرایش نسخه اپ",
+    createTitle: "ثبت نسخه اپ",
+    cancel: "انصراف",
+    save: "ذخیره",
+    requiredError: "نام اپ و آخرین نسخه الزامی است",
+    updated: "نسخه اپ بروزرسانی شد",
+    created: "نسخه اپ ایجاد شد",
+    saveError: "خطا در ذخیره نسخه اپ",
+    deleted: "نسخه اپ حذف شد",
+    deleteError: "خطا در حذف نسخه اپ",
+    deleteConfirm: (appName: string, platform: string) =>
+      `نسخه ${appName} برای ${platform} حذف شود؟`,
+    edit: "ویرایش",
+    delete: "حذف",
+    platforms: {
+      android: "اندروید",
+      ios: "iOS",
+      web: "وب",
+    },
+  },
+  en: {
+    title: "App versions",
+    description: "Manage releases by app name and platform.",
+    create: "Add version",
+    total: "Total versions",
+    activeVersions: "Active versions",
+    forcedUpdates: "Forced updates",
+    filters: "Version filters",
+    app: "Application",
+    versionNumber: "Version number",
+    versionPlaceholder: "Version",
+    allPlatforms: "All platforms",
+    clear: "Clear",
+    listTitle: "Update list",
+    listDescription: "Release status and download link for each version",
+    appName: "App name",
+    platform: "Platform",
+    latestVersion: "Latest version",
+    updateUrl: "Update URL",
+    forced: "Forced",
+    optional: "Optional",
+    status: "Status",
+    active: "Active",
+    inactive: "Inactive",
+    lastChange: "Last change",
+    actions: "Actions",
+    loading: "Loading...",
+    emptyFiltered: "No results found for the selected filters.",
+    empty: "No versions have been added.",
+    editTitle: "Edit app version",
+    createTitle: "Add app version",
+    cancel: "Cancel",
+    save: "Save",
+    requiredError: "App name and latest version are required",
+    updated: "App version updated",
+    created: "App version created",
+    saveError: "Could not save app version",
+    deleted: "App version deleted",
+    deleteError: "Could not delete app version",
+    deleteConfirm: (appName: string, platform: string) =>
+      `Delete ${appName} version for ${platform}?`,
+    edit: "Edit",
+    delete: "Delete",
+    platforms: {
+      android: "Android",
+      ios: "iOS",
+      web: "Web",
+    },
+  },
+} as const;
 
 const normalizeDigitsToEnglish = (value: string) =>
   value.replace(/[۰-۹٠-٩]/g, (digit) =>
@@ -90,6 +186,8 @@ const getFiltersFromUrl = (): AppVersionFilters => {
 };
 
 export default function AppVersionAdminPanel() {
+  const { language } = useAppSettings();
+  const copy = versionCopy[language] ?? versionCopy.fa;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingVersion, setEditingVersion] = useState<AppVersion | null>(null);
   const [formData, setFormData] = useState<AppVersionPayload>(emptyForm);
@@ -189,7 +287,7 @@ export default function AppVersionAdminPanel() {
     };
 
     if (!payload.appName || !payload.latestVersion) {
-      toast.error("نام اپ و آخرین نسخه الزامی است");
+      toast.error(copy.requiredError);
       return;
     }
 
@@ -199,38 +297,38 @@ export default function AppVersionAdminPanel() {
           id: editingVersion.id,
           payload,
         });
-        toast.success("نسخه اپ بروزرسانی شد");
+        toast.success(copy.updated);
       } else {
         await createMutation.mutateAsync(payload);
-        toast.success("نسخه اپ ایجاد شد");
+        toast.success(copy.created);
       }
 
       setIsDialogOpen(false);
       setEditingVersion(null);
       setFormData(emptyForm);
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "خطا در ذخیره نسخه اپ"));
+      toast.error(getErrorMessage(error, copy.saveError));
     }
   };
 
   const handleDelete = async (version: AppVersion) => {
     const confirmed = window.confirm(
-      `نسخه ${version.appName} برای ${platformLabels[version.platform]} حذف شود؟`,
+      copy.deleteConfirm(version.appName, copy.platforms[version.platform]),
     );
 
     if (!confirmed) return;
 
     try {
       await deleteMutation.mutateAsync(version.id);
-      toast.success("نسخه اپ حذف شد");
+      toast.success(copy.deleted);
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, "خطا در حذف نسخه اپ"));
+      toast.error(getErrorMessage(error, copy.deleteError));
     }
   };
 
   const formatDate = (value: string) => {
     if (!value) return "-";
-    return new Intl.DateTimeFormat("fa-IR", {
+    return new Intl.DateTimeFormat(language === "fa" ? "fa-IR" : "en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -250,10 +348,10 @@ export default function AppVersionAdminPanel() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-slate-950">
-                  مدیریت نسخه اپ‌ها
+                  {copy.title}
                 </h1>
                 <p className="mt-1 text-sm text-slate-500">
-                  نسخه‌ها بر اساس نام اپ و پلتفرم مدیریت می‌شوند.
+                  {copy.description}
                 </p>
               </div>
             </div>
@@ -264,7 +362,7 @@ export default function AppVersionAdminPanel() {
             className="bg-[#123c69] px-5 font-semibold text-white shadow-sm shadow-sky-900/20 hover:bg-[#0d3158]"
           >
             <Plus className="h-4 w-4" />
-            ثبت نسخه
+            {copy.create}
           </Button>
         </div>
       </header>
@@ -275,7 +373,7 @@ export default function AppVersionAdminPanel() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-slate-500">
-                  کل نسخه‌ها
+                  {copy.total}
                 </p>
                 <p className="mt-2 text-2xl font-extrabold text-slate-950">
                   {versionStats.total}
@@ -291,7 +389,7 @@ export default function AppVersionAdminPanel() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-emerald-700">
-                  نسخه‌های فعال
+                  {copy.activeVersions}
                 </p>
                 <p className="mt-2 text-2xl font-extrabold text-slate-950">
                   {versionStats.active}
@@ -307,7 +405,7 @@ export default function AppVersionAdminPanel() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-amber-700">
-                  آپدیت اجباری
+                  {copy.forcedUpdates}
                 </p>
                 <p className="mt-2 text-2xl font-extrabold text-slate-950">
                   {versionStats.forced}
@@ -327,21 +425,21 @@ export default function AppVersionAdminPanel() {
                 <Filter className="h-3.5 w-3.5" />
               </div>
               <h2 className="whitespace-nowrap text-sm font-bold text-slate-950">
-                فیلتر نسخه‌ها
+                {copy.filters}
               </h2>
             </div>
 
             <div className="grid flex-1 gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px_auto]">
               <div className="relative">
                 <Label htmlFor="appFilter" className="sr-only">
-                  اپلیکیشن
+                  {copy.app}
                 </Label>
                 <Search className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="appFilter"
                   value={filters.app || ""}
                   onChange={(event) => updateFilter("app", event.target.value)}
-                  placeholder="اپلیکیشن"
+                  placeholder={copy.app}
                   className="h-9 pr-8 text-sm placeholder:text-slate-400/70"
                   dir="ltr"
                 />
@@ -349,14 +447,14 @@ export default function AppVersionAdminPanel() {
 
               <div className="relative">
                 <Label htmlFor="versionFilter" className="sr-only">
-                  شماره ورژن
+                  {copy.versionNumber}
                 </Label>
                 <Search className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                 <Input
                   id="versionFilter"
                   value={filters.version || ""}
                   onChange={(event) => updateFilter("version", event.target.value)}
-                  placeholder="ورژن"
+                  placeholder={copy.versionPlaceholder}
                   className="h-9 pr-8 text-sm placeholder:text-slate-400/70"
                   dir="ltr"
                 />
@@ -369,13 +467,13 @@ export default function AppVersionAdminPanel() {
                 }
               >
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="همه پلتفرم‌ها" />
+                  <SelectValue placeholder={copy.allPlatforms} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__all__">همه پلتفرم‌ها</SelectItem>
-                  <SelectItem value="android">اندروید</SelectItem>
-                  <SelectItem value="ios">iOS</SelectItem>
-                  <SelectItem value="web">وب</SelectItem>
+                  <SelectItem value="__all__">{copy.allPlatforms}</SelectItem>
+                  <SelectItem value="android">{copy.platforms.android}</SelectItem>
+                  <SelectItem value="ios">{copy.platforms.ios}</SelectItem>
+                  <SelectItem value="web">{copy.platforms.web}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -387,7 +485,7 @@ export default function AppVersionAdminPanel() {
                 className="h-9 whitespace-nowrap border-slate-200 bg-slate-50 px-3 text-slate-700 shadow-none hover:bg-slate-100"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
-                پاک کردن
+                {copy.clear}
               </Button>
             </div>
           </div>
@@ -397,41 +495,41 @@ export default function AppVersionAdminPanel() {
           <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-4">
             <div>
               <h2 className="text-base font-bold text-slate-950">
-                لیست آپدیت‌ها
+                {copy.listTitle}
               </h2>
               <p className="mt-1 text-xs text-slate-500">
-                وضعیت انتشار و لینک دریافت هر نسخه
+                {copy.listDescription}
               </p>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-right text-sm">
+            <table className="w-full min-w-[900px] text-start text-sm">
               <thead className="bg-[#eef4f8] text-xs font-bold text-slate-700">
                 <tr>
-                  <th className="px-5 py-4">نام اپ</th>
-                  <th className="px-5 py-4">پلتفرم</th>
-                  <th className="px-5 py-4">آخرین نسخه</th>
-                  <th className="px-5 py-4">لینک آپدیت</th>
-                  <th className="px-5 py-4">اجباری</th>
-                  <th className="px-5 py-4">وضعیت</th>
-                  <th className="px-5 py-4">آخرین تغییر</th>
-                  <th className="px-5 py-4 text-center">عملیات</th>
+                  <th className="px-5 py-4">{copy.appName}</th>
+                  <th className="px-5 py-4">{copy.platform}</th>
+                  <th className="px-5 py-4">{copy.latestVersion}</th>
+                  <th className="px-5 py-4">{copy.updateUrl}</th>
+                  <th className="px-5 py-4">{copy.forced}</th>
+                  <th className="px-5 py-4">{copy.status}</th>
+                  <th className="px-5 py-4">{copy.lastChange}</th>
+                  <th className="px-5 py-4 text-center">{copy.actions}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {isLoading ? (
                   <tr>
                     <td className="px-5 py-10 text-center text-slate-500" colSpan={8}>
-                      در حال دریافت...
+                      {copy.loading}
                     </td>
                   </tr>
                 ) : versions.length === 0 ? (
                   <tr>
                     <td className="px-5 py-10 text-center text-slate-500" colSpan={8}>
                       {hasFilters
-                        ? "نتیجه‌ای برای فیلترهای انتخاب‌شده پیدا نشد."
-                        : "نسخه‌ای ثبت نشده است."}
+                        ? copy.emptyFiltered
+                        : copy.empty}
                     </td>
                   </tr>
                 ) : (
@@ -452,7 +550,7 @@ export default function AppVersionAdminPanel() {
                       </td>
                       <td className="px-5 py-4">
                         <Badge className={platformBadgeClass[version.platform]}>
-                          {platformLabels[version.platform]}
+                          {copy.platforms[version.platform]}
                         </Badge>
                       </td>
                       <td className="px-5 py-4">
@@ -490,7 +588,7 @@ export default function AppVersionAdminPanel() {
                             ) : (
                               <XCircle className="h-3.5 w-3.5" />
                             )}
-                            {version.forceUpdate ? "اجباری" : "اختیاری"}
+                            {version.forceUpdate ? copy.forced : copy.optional}
                           </span>
                         </Badge>
                       </td>
@@ -508,7 +606,7 @@ export default function AppVersionAdminPanel() {
                             ) : (
                               <XCircle className="h-3.5 w-3.5" />
                             )}
-                            {version.isActive ? "فعال" : "غیرفعال"}
+                            {version.isActive ? copy.active : copy.inactive}
                           </span>
                         </Badge>
                       </td>
@@ -521,7 +619,7 @@ export default function AppVersionAdminPanel() {
                             variant="outline"
                             size="icon"
                             onClick={() => openEditDialog(version)}
-                            title="ویرایش"
+                            title={copy.edit}
                             className="h-9 min-w-9 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 shadow-none hover:bg-indigo-100"
                           >
                             <Edit className="h-4 w-4" />
@@ -531,7 +629,7 @@ export default function AppVersionAdminPanel() {
                             size="icon"
                             onClick={() => handleDelete(version)}
                             disabled={deleteMutation.isPending}
-                            title="حذف"
+                            title={copy.delete}
                             className="h-9 min-w-9 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 shadow-none hover:bg-rose-100"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -550,15 +648,15 @@ export default function AppVersionAdminPanel() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl" onClose={() => setIsDialogOpen(false)}>
           <DialogHeader>
-            <DialogTitle className="text-right">
-              {editingVersion ? "ویرایش نسخه اپ" : "ثبت نسخه اپ"}
+            <DialogTitle className="text-start">
+              {editingVersion ? copy.editTitle : copy.createTitle}
             </DialogTitle>
           </DialogHeader>
 
           <div className="grid gap-5">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="appName">نام اپ</Label>
+                <Label htmlFor="appName">{copy.appName}</Label>
                 <Input
                   id="appName"
                   value={formData.appName}
@@ -575,7 +673,7 @@ export default function AppVersionAdminPanel() {
               </div>
 
               <div className="space-y-2">
-                <Label>پلتفرم</Label>
+                <Label>{copy.platform}</Label>
                 <Select
                   value={formData.platform}
                   onValueChange={(value) =>
@@ -589,9 +687,9 @@ export default function AppVersionAdminPanel() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="android">اندروید</SelectItem>
-                    <SelectItem value="ios">iOS</SelectItem>
-                    <SelectItem value="web">وب</SelectItem>
+                    <SelectItem value="android">{copy.platforms.android}</SelectItem>
+                    <SelectItem value="ios">{copy.platforms.ios}</SelectItem>
+                    <SelectItem value="web">{copy.platforms.web}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -599,7 +697,7 @@ export default function AppVersionAdminPanel() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="latestVersion">آخرین نسخه</Label>
+                <Label htmlFor="latestVersion">{copy.latestVersion}</Label>
                 <Input
                   id="latestVersion"
                   value={formData.latestVersion}
@@ -616,7 +714,7 @@ export default function AppVersionAdminPanel() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="updateUrl">لینک آپدیت</Label>
+                <Label htmlFor="updateUrl">{copy.updateUrl}</Label>
                 <Input
                   id="updateUrl"
                   value={formData.updateUrl}
@@ -646,7 +744,7 @@ export default function AppVersionAdminPanel() {
                   }
                   className="h-4 w-4 rounded border-slate-300"
                 />
-                آپدیت اجباری
+                {copy.forcedUpdates}
               </label>
 
               <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
@@ -661,7 +759,7 @@ export default function AppVersionAdminPanel() {
                   }
                   className="h-4 w-4 rounded border-slate-300"
                 />
-                فعال
+                {copy.active}
               </label>
             </div>
 
@@ -671,7 +769,7 @@ export default function AppVersionAdminPanel() {
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isSaving}
               >
-                انصراف
+                {copy.cancel}
               </Button>
               <Button
                 onClick={handleSubmit}
@@ -679,7 +777,7 @@ export default function AppVersionAdminPanel() {
                 className="bg-slate-900 text-white hover:bg-slate-800"
               >
                 <Save className="h-4 w-4" />
-                ذخیره
+                {copy.save}
               </Button>
             </div>
           </div>
