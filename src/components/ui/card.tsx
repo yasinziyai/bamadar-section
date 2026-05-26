@@ -11,7 +11,10 @@ const Card = React.forwardRef<
   return (
     <HeroCardRoot
       ref={ref}
-      className={cn("border border-slate-200 bg-white text-card-foreground", className)}
+      className={cn(
+        "border border-slate-200 bg-white text-card-foreground dark:border-[var(--app-border)] dark:bg-[var(--app-surface)] dark:text-[var(--app-text)]",
+        className,
+      )}
       variant="default"
       {...props}
     >

@@ -29,7 +29,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
       <ModalDialog
         ref={ref}
         className={cn(
-          "relative grid w-full max-w-lg gap-4 border border-slate-200 bg-white p-6 shadow-xl",
+          "relative grid w-full max-w-lg gap-4 border border-slate-200 bg-white p-6 text-slate-950 shadow-xl dark:border-[var(--app-border)] dark:bg-[var(--app-surface)] dark:text-[var(--app-text)]",
           className,
         )}
         {...props}
@@ -47,7 +47,7 @@ const DialogHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <Modal.Header
-    className={cn("flex flex-col space-y-1.5 text-right", className)}
+    className={cn("flex flex-col space-y-1.5 text-start", className)}
     {...props}
   />
 );

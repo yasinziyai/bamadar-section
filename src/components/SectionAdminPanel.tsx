@@ -51,6 +51,7 @@ import { useUploadImage } from "@/hooks/useUploadImage";
 import { getImageUrl } from "@/lib/imageUrl";
 import { formatJalaliForDisplay, ensureIsoDate } from "@/lib/dateUtils";
 import { PersianDateInput } from "@/components/ui/persian-date-input";
+import { useAppSettings } from "@/lib/appSettings";
 
 const sectionTypeStyles: Record<SectionType, string> = {
   IconGrid: "border-sky-200 bg-sky-50 text-sky-700",
@@ -60,7 +61,152 @@ const sectionTypeStyles: Record<SectionType, string> = {
   ServiceGrid: "border-rose-200 bg-rose-50 text-rose-700",
 };
 
+const sectionCopy = {
+  fa: {
+    title: "مدیریت سکشن‌ها",
+    description: "سکشن‌های صفحه را اضافه، ویرایش و جابه‌جا کنید.",
+    addSection: "افزودن سکشن جدید",
+    totalSections: "کل سکشن‌ها",
+    totalContents: "کل محتواها",
+    imageItems: "آیتم‌های تصویری",
+    dragHint: "برای تغییر ترتیب سکشن‌ها، کارت‌ها را بگیرید و بکشید.",
+    editHint: "تغییر جزئیات هر سکشن از دکمه ویرایش انجام می‌شود.",
+    noImage: "بدون تصویر",
+    untitled: "بدون عنوان",
+    contentCount: "تعداد محتوا",
+    unnamed: "بدون نام",
+    moreItems: (count: number) => `و ${count} مورد دیگر...`,
+    edit: "ویرایش",
+    emptyTitle: "هنوز سکشنی ایجاد نشده است",
+    emptyDescription: "برای شروع، روی «افزودن سکشن جدید» کلیک کنید",
+    editSection: "ویرایش سکشن",
+    createSection: "ایجاد سکشن جدید",
+    dialogDescription: "اطلاعات سکشن و آیتم‌های داخل آن را تنظیم کنید.",
+    sectionType: "نوع سکشن *",
+    sectionTypePlaceholder: "نوع سکشن",
+    position: "موقعیت *",
+    positionPlain: "موقعیت",
+    titleLabel: "عنوان",
+    titlePlaceholder: "عنوان (اختیاری)",
+    contents: "محتواها",
+    add: "افزودن",
+    contentNamePlaceholder: "نام محتوا *",
+    image: "تصویر",
+    uploading: "در حال آپلود...",
+    imageUrl: "URL تصویر",
+    actionType: "نوع اکشن *",
+    actionTypePlaceholder: "نوع اکشن",
+    address: "آدرس *",
+    addressPlaceholder: "آدرس",
+    badgeName: "نام نشان",
+    badgeNamePlaceholder: "نام نشان",
+    badgeColor: "رنگ نشان",
+    publishedAt: "تاریخ انتشار (شمسی)",
+    unpublishedAt: "تاریخ عدم انتشار (شمسی)",
+    now: "الان",
+    emptyContent: "هنوز محتوایی اضافه نشده است",
+    addContent: "افزودن محتوا",
+    cancel: "انصراف",
+    save: "ذخیره",
+    saving: "در حال ذخیره...",
+    reorderSuccess: "ترتیب سکشن‌ها با موفقیت بروزرسانی شد",
+    reorderError: "خطا در بروزرسانی ترتیب سکشن‌ها. لطفا دوباره تلاش کنید.",
+    imageUrlMissing: "URL عکس در پاسخ یافت نشد",
+    uploadError: "خطا در آپلود عکس. لطفا دوباره تلاش کنید.",
+    submitSuccessEdit: "سکشن با موفقیت ویرایش شد",
+    submitSuccessCreate: "سکشن با موفقیت ایجاد شد",
+    submitError: "خطا در ارسال درخواست. لطفا دوباره تلاش کنید.",
+    deleteConfirm: "آیا از حذف این سکشن اطمینان دارید؟",
+    deleteSuccess: "سکشن با موفقیت حذف شد",
+    deleteError: "خطا در حذف سکشن",
+    actions: {
+      Web: "وب",
+      Internal: "داخلی",
+      None: "هیچ",
+    },
+    types: {
+      IconGrid: "شبکه آیکون",
+      HeroBanner: "بنر اصلی",
+      Carousel: "کاروسل",
+      SingleImage: "تصویر واحد",
+      ServiceGrid: "شبکه سرویس",
+    },
+  },
+  en: {
+    title: "Sections",
+    description: "Add, edit, and reorder homepage sections.",
+    addSection: "Add section",
+    totalSections: "Total sections",
+    totalContents: "Total content",
+    imageItems: "Image items",
+    dragHint: "Drag cards to change the section order.",
+    editHint: "Use the edit button to change section details.",
+    noImage: "No image",
+    untitled: "Untitled",
+    contentCount: "Content count",
+    unnamed: "Unnamed",
+    moreItems: (count: number) => `and ${count} more...`,
+    edit: "Edit",
+    emptyTitle: "No sections have been created",
+    emptyDescription: "Start by clicking Add section",
+    editSection: "Edit section",
+    createSection: "Create section",
+    dialogDescription: "Configure the section and its content items.",
+    sectionType: "Section type *",
+    sectionTypePlaceholder: "Section type",
+    position: "Position *",
+    positionPlain: "Position",
+    titleLabel: "Title",
+    titlePlaceholder: "Title (optional)",
+    contents: "Content",
+    add: "Add",
+    contentNamePlaceholder: "Content name *",
+    image: "Image",
+    uploading: "Uploading...",
+    imageUrl: "Image URL",
+    actionType: "Action type *",
+    actionTypePlaceholder: "Action type",
+    address: "Address *",
+    addressPlaceholder: "Address",
+    badgeName: "Badge name",
+    badgeNamePlaceholder: "Badge name",
+    badgeColor: "Badge color",
+    publishedAt: "Publish date (Jalali)",
+    unpublishedAt: "Unpublish date (Jalali)",
+    now: "Now",
+    emptyContent: "No content has been added",
+    addContent: "Add content",
+    cancel: "Cancel",
+    save: "Save",
+    saving: "Saving...",
+    reorderSuccess: "Section order updated",
+    reorderError: "Could not update section order. Please try again.",
+    imageUrlMissing: "Image URL was not found in the response",
+    uploadError: "Could not upload image. Please try again.",
+    submitSuccessEdit: "Section updated",
+    submitSuccessCreate: "Section created",
+    submitError: "Could not submit request. Please try again.",
+    deleteConfirm: "Are you sure you want to delete this section?",
+    deleteSuccess: "Section deleted",
+    deleteError: "Could not delete section",
+    actions: {
+      Web: "Web",
+      Internal: "Internal",
+      None: "None",
+    },
+    types: {
+      IconGrid: "Icon grid",
+      HeroBanner: "Hero banner",
+      Carousel: "Carousel",
+      SingleImage: "Single image",
+      ServiceGrid: "Service grid",
+    },
+  },
+} as const;
+
 export default function SectionAdminPanel() {
+  const { language } = useAppSettings();
+  const copy = sectionCopy[language] ?? sectionCopy.fa;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<Section | null>(null);
   const [draggingSectionId, setDraggingSectionId] = useState<number | null>(
@@ -158,12 +304,11 @@ export default function SectionAdminPanel() {
         }),
       );
 
-      toast.success("ترتیب سکشن‌ها با موفقیت بروزرسانی شد");
+      toast.success(copy.reorderSuccess);
     } catch (error: any) {
       console.error("Error reordering sections:", error);
       toast.error(
-        error.message ||
-          "خطا در بروزرسانی ترتیب سکشن‌ها. لطفا دوباره تلاش کنید.",
+        error.message || copy.reorderError,
       );
     } finally {
       setDraggingSectionId(null);
@@ -253,11 +398,11 @@ export default function SectionAdminPanel() {
         handleContentChange(index, "image", imageUrl);
       } else {
         console.warn("Response:", result);
-        throw new Error("URL عکس در پاسخ یافت نشد");
+        throw new Error(copy.imageUrlMissing);
       }
     } catch (error: any) {
       console.error("Error uploading image:", error);
-      toast.error(error.message || "خطا در آپلود عکس. لطفا دوباره تلاش کنید.");
+      toast.error(error.message || copy.uploadError);
     }
   };
 
@@ -367,12 +512,12 @@ export default function SectionAdminPanel() {
       setIsDialogOpen(false);
       resetForm();
       toast.success(
-        editingSection ? "سکشن با موفقیت ویرایش شد" : "سکشن با موفقیت ایجاد شد",
+        editingSection ? copy.submitSuccessEdit : copy.submitSuccessCreate,
       );
     } catch (error: any) {
       console.error("Error:", error);
       toast.error(
-        error.message || "خطا در ارسال درخواست. لطفا دوباره تلاش کنید.",
+        error.message || copy.submitError,
       );
     }
   };
@@ -434,31 +579,24 @@ export default function SectionAdminPanel() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("آیا از حذف این سکشن اطمینان دارید؟")) return;
+    if (!window.confirm(copy.deleteConfirm)) return;
 
     try {
       await deleteSectionMutation.mutateAsync(id);
-      toast.success("سکشن با موفقیت حذف شد");
+      toast.success(copy.deleteSuccess);
     } catch (error: any) {
       console.error("Error:", error);
-      toast.error(error.message || "خطا در حذف سکشن");
+      toast.error(error.message || copy.deleteError);
     }
   };
 
   const getSectionTypeLabel = (type: SectionType) => {
-    const labels: Record<SectionType, string> = {
-      IconGrid: "شبکه آیکون",
-      HeroBanner: "بنر اصلی",
-      Carousel: "کاروسل",
-      SingleImage: "تصویر واحد",
-      ServiceGrid: "شبکه سرویس",
-    };
-    return labels[type];
+    return copy.types[type];
   };
 
   return (
     <div className="min-h-screen bg-[#f6f8fb]">
-      <header className="border-b border-slate-200 bg-white px-6 py-5" dir="rtl">
+      <header className="border-b border-slate-200 bg-white px-6 py-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#123c69] shadow-sm shadow-sky-900/15">
@@ -466,10 +604,10 @@ export default function SectionAdminPanel() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-950">
-                مدیریت سکشن‌ها
+                {copy.title}
               </h1>
               <p className="mt-1 text-sm text-slate-500">
-                سکشن‌های صفحه را اضافه، ویرایش و جابه‌جا کنید.
+                {copy.description}
               </p>
             </div>
           </div>
@@ -481,18 +619,18 @@ export default function SectionAdminPanel() {
             className="whitespace-nowrap bg-[#123c69] px-5 font-semibold text-white shadow-sm shadow-sky-900/20 hover:bg-[#0d3158]"
           >
             <Plus className="h-4 w-4" />
-            افزودن سکشن جدید
+            {copy.addSection}
           </Button>
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl px-6 py-6" dir="rtl">
+      <div className="mx-auto max-w-6xl px-6 py-6">
         <div className="mb-5 grid gap-3 md:grid-cols-3">
           <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-slate-500">
-                  کل سکشن‌ها
+                  {copy.totalSections}
                 </p>
                 <p className="mt-2 text-2xl font-extrabold text-slate-950">
                   {sectionStats.total}
@@ -508,7 +646,7 @@ export default function SectionAdminPanel() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-emerald-700">
-                  کل محتواها
+                  {copy.totalContents}
                 </p>
                 <p className="mt-2 text-2xl font-extrabold text-slate-950">
                   {sectionStats.contents}
@@ -524,7 +662,7 @@ export default function SectionAdminPanel() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-amber-700">
-                  آیتم‌های تصویری
+                  {copy.imageItems}
                 </p>
                 <p className="mt-2 text-2xl font-extrabold text-slate-950">
                   {sectionStats.images}
@@ -540,9 +678,9 @@ export default function SectionAdminPanel() {
         <div className="mb-4 flex flex-col gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <span className="inline-flex items-center gap-2">
             <Move className="h-4 w-4 text-sky-700" />
-            برای تغییر ترتیب سکشن‌ها، کارت‌ها را بگیرید و بکشید.
+            {copy.dragHint}
           </span>
-          <span>تغییر جزئیات هر سکشن از دکمه ویرایش انجام می‌شود.</span>
+          <span>{copy.editHint}</span>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -634,7 +772,7 @@ export default function SectionAdminPanel() {
                         <ImageIcon className="h-5 w-5" />
                       </div>
                       <p className="text-xs font-medium text-slate-400">
-                        بدون تصویر
+                        {copy.noImage}
                       </p>
                     </div>
                   </div>
@@ -644,7 +782,7 @@ export default function SectionAdminPanel() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <CardTitle className="mb-2 line-clamp-2 text-base font-bold text-slate-950">
-                        {section.title || "بدون عنوان"}
+                        {section.title || copy.untitled}
                       </CardTitle>
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge
@@ -668,7 +806,7 @@ export default function SectionAdminPanel() {
                       <div className="flex items-center gap-2">
                         <Layers className="h-4 w-4 text-emerald-700" />
                         <span className="text-sm font-semibold text-emerald-800">
-                          تعداد محتوا
+                          {copy.contentCount}
                         </span>
                       </div>
                       <span className="rounded-md bg-white px-2 py-0.5 text-sm font-extrabold text-slate-950 ring-1 ring-emerald-100">
@@ -688,7 +826,7 @@ export default function SectionAdminPanel() {
                               {idx + 1}
                             </div>
                             <span className="flex-1 truncate text-xs font-medium text-slate-700">
-                              {item.name || "بدون نام"}
+                              {item.name || copy.unnamed}
                             </span>
                             {item.badgeName && (
                               <Badge
@@ -705,7 +843,7 @@ export default function SectionAdminPanel() {
                         ))}
                         {contentItems.length > 3 && (
                           <p className="pt-1 text-center text-xs text-slate-500">
-                            و {contentItems.length - 3} مورد دیگر...
+                            {copy.moreItems(contentItems.length - 3)}
                           </p>
                         )}
                       </div>
@@ -720,7 +858,7 @@ export default function SectionAdminPanel() {
                         className="flex-1 border-indigo-200 bg-indigo-50 font-semibold text-indigo-700 shadow-none hover:bg-indigo-100"
                       >
                         <Edit className="h-4 w-4" />
-                        ویرایش
+                        {copy.edit}
                       </Button>
                       {section.id && (
                         <Button
@@ -747,10 +885,10 @@ export default function SectionAdminPanel() {
                 <LayoutGrid className="h-6 w-6" />
               </div>
               <p className="text-base font-bold text-slate-700 md:text-lg">
-                هنوز سکشنی ایجاد نشده است
+                {copy.emptyTitle}
               </p>
               <p className="mt-2 text-sm text-slate-400">
-                برای شروع، روی «افزودن سکشن جدید» کلیک کنید
+                {copy.emptyDescription}
               </p>
             </CardContent>
           </Card>
@@ -768,24 +906,23 @@ export default function SectionAdminPanel() {
       >
         <DialogContent
           className="flex max-h-[90vh] max-w-4xl flex-col overflow-hidden p-0"
-          dir="rtl"
           onClose={() => {
             setIsDialogOpen(false);
             resetForm();
           }}
         >
           <div className="border-b border-slate-200 bg-[#eef4f8] p-4">
-            <DialogHeader className="text-right">
+            <DialogHeader className="text-start">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-sky-700 shadow-sm">
                   <Palette className="h-5 w-5" />
                 </div>
                 <div>
-                  <DialogTitle className="text-right text-lg font-bold text-slate-950">
-                    {editingSection ? "ویرایش سکشن" : "ایجاد سکشن جدید"}
+                  <DialogTitle className="text-start text-lg font-bold text-slate-950">
+                    {editingSection ? copy.editSection : copy.createSection}
                   </DialogTitle>
                   <p className="mt-1 text-xs text-slate-500">
-                    اطلاعات سکشن و آیتم‌های داخل آن را تنظیم کنید.
+                    {copy.dialogDescription}
                   </p>
                 </div>
               </div>
@@ -803,7 +940,7 @@ export default function SectionAdminPanel() {
                   htmlFor="type"
                   className="text-xs font-medium text-slate-600"
                 >
-                  نوع سکشن *
+                  {copy.sectionType}
                 </Label>
                 <Select
                   value={formData.type}
@@ -815,14 +952,14 @@ export default function SectionAdminPanel() {
                   }
                 >
                   <SelectTrigger className="h-9 text-sm">
-                    <SelectValue placeholder="نوع سکشن" />
+                    <SelectValue placeholder={copy.sectionTypePlaceholder} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="IconGrid">شبکه آیکون</SelectItem>
-                    <SelectItem value="HeroBanner">بنر اصلی</SelectItem>
-                    <SelectItem value="Carousel">کاروسل</SelectItem>
-                    <SelectItem value="SingleImage">تصویر واحد</SelectItem>
-                    <SelectItem value="ServiceGrid">شبکه سرویس</SelectItem>
+                    <SelectItem value="IconGrid">{copy.types.IconGrid}</SelectItem>
+                    <SelectItem value="HeroBanner">{copy.types.HeroBanner}</SelectItem>
+                    <SelectItem value="Carousel">{copy.types.Carousel}</SelectItem>
+                    <SelectItem value="SingleImage">{copy.types.SingleImage}</SelectItem>
+                    <SelectItem value="ServiceGrid">{copy.types.ServiceGrid}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -832,7 +969,7 @@ export default function SectionAdminPanel() {
                   htmlFor="position"
                   className="text-xs font-medium text-slate-600"
                 >
-                  موقعیت *
+                  {copy.position}
                 </Label>
                 <Input
                   id="position"
@@ -855,7 +992,7 @@ export default function SectionAdminPanel() {
                   htmlFor="title"
                   className="text-xs font-medium text-slate-600"
                 >
-                  عنوان
+                  {copy.titleLabel}
                 </Label>
                 <Input
                   id="title"
@@ -863,7 +1000,7 @@ export default function SectionAdminPanel() {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, title: e.target.value }))
                   }
-                  placeholder="عنوان (اختیاری)"
+                  placeholder={copy.titlePlaceholder}
                   className="h-9 text-sm"
                 />
               </div>
@@ -873,7 +1010,7 @@ export default function SectionAdminPanel() {
             <div className="space-y-3">
               <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
                 <h3 className="text-sm font-bold text-slate-900">
-                  محتواها ({formData.contentItems?.length || 0})
+                  {copy.contents} ({formData.contentItems?.length || 0})
                 </h3>
                 <Button
                   type="button"
@@ -883,7 +1020,7 @@ export default function SectionAdminPanel() {
                   className="h-8 border-sky-200 bg-sky-50 text-xs font-semibold text-sky-700 shadow-none hover:bg-sky-100"
                 >
                   <Plus className="h-3 w-3" />
-                  افزودن
+                  {copy.add}
                 </Button>
               </div>
 
@@ -908,7 +1045,7 @@ export default function SectionAdminPanel() {
                           onChange={(e) =>
                             handleContentChange(index, "name", e.target.value)
                           }
-                          placeholder="نام محتوا *"
+                          placeholder={copy.contentNamePlaceholder}
                           required
                           className="h-8 border-0 bg-transparent p-0 text-sm font-bold focus-visible:ring-0"
                         />
@@ -927,7 +1064,7 @@ export default function SectionAdminPanel() {
                     <div className="grid gap-3 md:grid-cols-2">
                       <div className="space-y-1.5">
                         <Label className="text-xs font-medium text-slate-600">
-                          تصویر
+                          {copy.image}
                         </Label>
                         <div className="space-y-2">
                           <Input
@@ -945,7 +1082,7 @@ export default function SectionAdminPanel() {
                           {uploadImageMutation.isPending && (
                             <p className="text-xs text-blue-600 flex items-center gap-1">
                               <span className="animate-spin">⏳</span>
-                              در حال آپلود...
+                              {copy.uploading}
                             </p>
                           )}
                           {content.image && (
@@ -959,7 +1096,7 @@ export default function SectionAdminPanel() {
                                     e.target.value,
                                   )
                                 }
-                                placeholder="URL تصویر"
+                                placeholder={copy.imageUrl}
                                 className="text-xs h-7"
                               />
                               <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
@@ -982,7 +1119,7 @@ export default function SectionAdminPanel() {
 
                       <div className="space-y-1.5">
                         <Label className="text-xs font-medium text-slate-600">
-                          نوع اکشن *
+                          {copy.actionType}
                         </Label>
                         <Select
                           value={content.actionType}
@@ -995,19 +1132,19 @@ export default function SectionAdminPanel() {
                           }
                         >
                           <SelectTrigger className="h-8 text-sm">
-                            <SelectValue placeholder="نوع اکشن" />
+                            <SelectValue placeholder={copy.actionTypePlaceholder} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Web">وب</SelectItem>
-                            <SelectItem value="Internal">داخلی</SelectItem>
-                            <SelectItem value="None">هیچ</SelectItem>
+                            <SelectItem value="Web">{copy.actions.Web}</SelectItem>
+                            <SelectItem value="Internal">{copy.actions.Internal}</SelectItem>
+                            <SelectItem value="None">{copy.actions.None}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-1.5">
                         <Label className="text-xs font-medium text-slate-600">
-                          آدرس *
+                          {copy.address}
                         </Label>
                         <Input
                           value={content.address}
@@ -1019,14 +1156,14 @@ export default function SectionAdminPanel() {
                             )
                           }
                           required
-                          placeholder="آدرس"
+                          placeholder={copy.addressPlaceholder}
                           className="h-8 text-sm"
                         />
                       </div>
 
                       <div className="space-y-1.5">
                         <Label className="text-xs font-medium text-slate-600">
-                          موقعیت
+                          {copy.positionPlain}
                         </Label>
                         <Input
                           type="number"
@@ -1046,7 +1183,7 @@ export default function SectionAdminPanel() {
 
                       <div className="space-y-1.5">
                         <Label className="text-xs font-medium text-slate-600">
-                          نام نشان
+                          {copy.badgeName}
                         </Label>
                         <Input
                           value={content.badgeName}
@@ -1057,14 +1194,14 @@ export default function SectionAdminPanel() {
                               e.target.value,
                             )
                           }
-                          placeholder="نام نشان"
+                          placeholder={copy.badgeNamePlaceholder}
                           className="h-8 text-sm"
                         />
                       </div>
 
                       <div className="space-y-1.5">
                         <Label className="text-xs font-medium text-slate-600">
-                          رنگ نشان
+                          {copy.badgeColor}
                         </Label>
                         <div className="flex gap-2 items-center">
                           <Input
@@ -1099,7 +1236,7 @@ export default function SectionAdminPanel() {
                         <div className="space-y-1.5">
                           <div className="flex items-center justify-between">
                             <Label className="text-xs font-medium text-slate-600">
-                              تاریخ انتشار (شمسی)
+                              {copy.publishedAt}
                             </Label>
                             <Button
                               type="button"
@@ -1115,7 +1252,7 @@ export default function SectionAdminPanel() {
                                 );
                               }}
                             >
-                              الان
+                              {copy.now}
                             </Button>
                           </div>
                           <PersianDateInput
@@ -1139,7 +1276,7 @@ export default function SectionAdminPanel() {
                         <div className="space-y-1.5">
                           <div className="flex items-center justify-between">
                             <Label className="text-xs font-medium text-slate-600">
-                              تاریخ عدم انتشار (شمسی)
+                              {copy.unpublishedAt}
                             </Label>
                             <Button
                               type="button"
@@ -1155,7 +1292,7 @@ export default function SectionAdminPanel() {
                                 );
                               }}
                             >
-                              الان
+                              {copy.now}
                             </Button>
                           </div>
                           <PersianDateInput
@@ -1190,7 +1327,7 @@ export default function SectionAdminPanel() {
                       <Plus className="h-6 w-6" />
                     </div>
                     <p className="text-sm font-bold text-slate-700">
-                      هنوز محتوایی اضافه نشده است
+                      {copy.emptyContent}
                     </p>
                     <Button
                       type="button"
@@ -1200,7 +1337,7 @@ export default function SectionAdminPanel() {
                       className="h-8 border-sky-200 bg-sky-50 text-xs font-semibold text-sky-700 shadow-none hover:bg-sky-100"
                     >
                       <Plus className="h-3 w-3" />
-                      افزودن محتوا
+                      {copy.addContent}
                     </Button>
                   </div>
                 </Card>
@@ -1218,7 +1355,7 @@ export default function SectionAdminPanel() {
               }}
               className="h-9 min-w-[90px] border-slate-300 text-sm"
             >
-              انصراف
+              {copy.cancel}
             </Button>
             <Button
               type="submit"
@@ -1237,8 +1374,8 @@ export default function SectionAdminPanel() {
               updateSectionMutation.isPending ||
               createContentMutation.isPending ||
               updateContentMutation.isPending
-                ? "در حال ذخیره..."
-                : "ذخیره"}
+                ? copy.saving
+                : copy.save}
             </Button>
           </div>
         </DialogContent>

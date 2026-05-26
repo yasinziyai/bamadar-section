@@ -13,7 +13,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <HeroInput
         ref={ref}
         className={cn(
-          "file:border-0 file:bg-transparent file:text-sm file:font-medium",
+          "file:border-0 file:bg-transparent file:text-sm file:font-medium dark:border-[var(--app-border)] dark:bg-[var(--app-input)] dark:text-[var(--app-text)] dark:placeholder:text-[var(--app-text-muted)]",
           className,
         )}
         disabled={disabled}

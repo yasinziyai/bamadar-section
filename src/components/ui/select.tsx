@@ -64,7 +64,7 @@ const SelectTrigger = React.forwardRef<
     <HeroSelectTrigger
       ref={ref}
       className={cn(
-        "h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-none transition-colors hover:border-slate-400",
+        "h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-none transition-colors hover:border-slate-400 dark:border-[var(--app-border)] dark:bg-[var(--app-input)] dark:text-[var(--app-text)] dark:hover:border-slate-500",
         className,
       )}
       {...props}
@@ -82,10 +82,13 @@ const SelectContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <HeroSelect.Popover
     ref={ref}
-    className={cn("rounded-lg border border-slate-200 bg-white p-1 shadow-lg", className)}
+    className={cn(
+      "rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-[var(--app-border)] dark:bg-[var(--app-surface-alt)] dark:text-[var(--app-text)]",
+      className,
+    )}
     {...props}
   >
-    <ListBox className="max-h-72 min-w-[var(--trigger-width)] overflow-auto text-right">
+    <ListBox className="max-h-72 min-w-[var(--trigger-width)] overflow-auto text-start">
       {children}
     </ListBox>
   </HeroSelect.Popover>
@@ -103,7 +106,7 @@ const SelectItem = React.forwardRef<
     <ListBoxItem
       ref={ref}
       className={cn(
-        "relative flex w-full cursor-default select-none items-center rounded-md py-2 pr-3 pl-8 text-sm outline-none hover:bg-slate-100 data-[selected=true]:bg-slate-100",
+        "relative flex w-full cursor-default select-none items-center rounded-md px-3 py-2 text-sm outline-none hover:bg-slate-100 data-[selected=true]:bg-slate-100 dark:hover:bg-white/10 dark:data-[selected=true]:bg-white/10",
         className,
       )}
       id={value}
@@ -112,7 +115,7 @@ const SelectItem = React.forwardRef<
       {...props}
     >
       {children}
-      <ListBoxItemIndicator className="absolute left-2">
+      <ListBoxItemIndicator className="absolute end-2">
         <Check className="h-4 w-4" />
       </ListBoxItemIndicator>
     </ListBoxItem>
@@ -124,7 +127,7 @@ const SelectLabel = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("py-1.5 pr-3 pl-2 text-sm font-semibold", className)} {...props} />
+  <div ref={ref} className={cn("px-3 py-1.5 text-sm font-semibold", className)} {...props} />
 ));
 SelectLabel.displayName = "SelectLabel";
 
