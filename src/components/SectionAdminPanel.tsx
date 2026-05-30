@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -204,6 +205,68 @@ const sectionCopy = {
   },
 } as const;
 
+function SectionAdminSkeleton() {
+  return (
+    <>
+      <div className="mb-5 grid gap-3 md:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div
+            key={index}
+            className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="w-full max-w-32">
+                <Skeleton className="h-3 w-24 bg-slate-200" />
+                <Skeleton className="mt-3 h-7 w-12 bg-slate-200" />
+              </div>
+              <Skeleton className="h-10 w-10 rounded-lg bg-slate-200" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mb-4 flex flex-col gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <Skeleton className="h-4 w-full max-w-sm bg-slate-200" />
+        <Skeleton className="h-4 w-full max-w-xs bg-slate-200" />
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Card
+            key={index}
+            className="overflow-hidden rounded-xl border-slate-200 bg-white shadow-sm shadow-slate-200/70"
+          >
+            <Skeleton className="h-40 rounded-none bg-slate-200 md:h-48" />
+            <CardHeader className="pb-3">
+              <div className="space-y-3">
+                <Skeleton className="h-5 w-3/4 bg-slate-200" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-6 w-20 rounded-md bg-slate-200" />
+                  <Skeleton className="h-6 w-12 rounded-md bg-slate-200" />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-4">
+                <Skeleton className="h-12 rounded-lg bg-slate-200" />
+                <div className="min-h-32 space-y-2">
+                  <Skeleton className="h-10 rounded-lg bg-slate-200" />
+                  <Skeleton className="h-10 rounded-lg bg-slate-200" />
+                  <Skeleton className="h-10 rounded-lg bg-slate-200" />
+                </div>
+                <div className="flex gap-2 border-t border-slate-200 pt-2">
+                  <Skeleton className="h-9 flex-1 rounded-md bg-slate-200" />
+                  <Skeleton className="h-9 w-14 rounded-md bg-slate-200" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export default function SectionAdminPanel() {
   const { language } = useAppSettings();
   const copy = sectionCopy[language] ?? sectionCopy.fa;
@@ -223,7 +286,7 @@ export default function SectionAdminPanel() {
   });
 
   // React Query hooks
-  const { data: sectionsData } = useGetSections();
+  const { data: sectionsData, isLoading } = useGetSections();
   const sections = sectionsData?.data || sectionsData || [];
   const sectionStats = {
     total: (sections as Section[]).length,
@@ -625,6 +688,10 @@ export default function SectionAdminPanel() {
       </header>
 
       <div className="mx-auto max-w-6xl px-6 py-6">
+        {isLoading ? (
+          <SectionAdminSkeleton />
+        ) : (
+          <>
         <div className="mb-5 grid gap-3 md:grid-cols-3">
           <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3">
@@ -892,6 +959,8 @@ export default function SectionAdminPanel() {
               </p>
             </CardContent>
           </Card>
+        )}
+          </>
         )}
       </div>
 
